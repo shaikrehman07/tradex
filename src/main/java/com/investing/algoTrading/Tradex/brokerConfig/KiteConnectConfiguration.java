@@ -7,6 +7,5 @@ public interface KiteConnectConfiguration {
     String getLoginURL();
     boolean createKiteConnectSession(String requestToken);
     void setAccessToken(String accessToken);
-    String getAccessToken();
     KiteConnect getKiteConnectInstance();
 }

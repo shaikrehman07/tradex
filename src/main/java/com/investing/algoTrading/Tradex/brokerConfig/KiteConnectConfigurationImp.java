@@ -29,17 +29,12 @@ public class KiteConnectConfigurationImp implements KiteConnectConfiguration {
 
     @Override
     public boolean createKiteConnectSession(String requestToken) {
+
         try {
             String apiSecret = this.apiSecret;
             User user = this.kiteConnect.generateSession(requestToken, apiSecret);
 
-            if(TokenManager.hasToken()){
-                TokenManager.clearToken();
-            }
-
             this.setAccessToken(user.accessToken);
-
-            this.kiteConnect.setAccessToken(user.accessToken);
             this.kiteConnect.setPublicToken(user.publicToken);
 
         } catch (IOException | KiteException e) {
@@ -51,22 +46,11 @@ public class KiteConnectConfigurationImp implements KiteConnectConfiguration {
 
     @Override
     public void setAccessToken(String accessToken){
-        TokenManager.saveToken(accessToken);
-    }
-
-    @Override
-    public String getAccessToken(){
-        if(TokenManager.hasToken()) {
-            return TokenManager.getToken();
-        }
-
-        return EMPTY_STRING;
+        this.kiteConnect.setAccessToken(accessToken);
     }
 
     @Override
     public KiteConnect getKiteConnectInstance(){
-        String accessToken = this.getAccessToken();
-        this.kiteConnect.setAccessToken(accessToken);
         return this.kiteConnect;
     }
 
