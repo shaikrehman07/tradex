@@ -2,22 +2,18 @@ package com.investing.algoTrading.Tradex.controller;
 
 import com.investing.algoTrading.Tradex.model.KiteSession;
 import com.investing.algoTrading.Tradex.model.Position;
-import com.investing.algoTrading.Tradex.service.KiteConnectService;
-
-import org.json.JSONObject;
-import org.springframework.http.HttpStatus;
+import com.investing.algoTrading.Tradex.service.BrokerService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
 public class TradexController {
 
-    private final KiteConnectService kiteConnectService;
+    private final BrokerService kiteConnectService;
 
-    public TradexController(KiteConnectService kiteConnectService){
+    public TradexController(BrokerService kiteConnectService){
         this.kiteConnectService = kiteConnectService;
     }
 
@@ -41,15 +37,13 @@ public class TradexController {
 
     @GetMapping("/logout")
     public ResponseEntity<Void> brokerLogout(@RequestHeader("Authorization") String authHeader){
-        kiteConnectService.setToken(authHeader);
-        kiteConnectService.brokerLogout();
+        kiteConnectService.brokerLogout(authHeader);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/positions")
     public ResponseEntity<List<Position>> getPositions(@RequestHeader("Authorization") String authHeader){
-        kiteConnectService.setToken(authHeader);
-        List<Position> positions = kiteConnectService.getPositions();
+        List<Position> positions = kiteConnectService.getPositions(authHeader);
         return ResponseEntity.ok(positions);
     }
 

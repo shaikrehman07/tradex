@@ -8,18 +8,15 @@ import com.investing.algoTrading.Tradex.model.Position;
 import com.zerodhatech.kiteconnect.utils.Constants;
 import com.zerodhatech.models.Order;
 import com.zerodhatech.models.OrderParams;
-import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
 @Service
-public class KiteConnectServiceImp implements KiteConnectService{
+public class KiteConnectServiceImp implements BrokerService{
 
     private final KiteConnectConfiguration kiteConnectConfiguration;
-
-    private String accessToken;
 
     public KiteConnectServiceImp(KiteConnectConfiguration kiteConnectConfiguration){
         this.kiteConnectConfiguration = kiteConnectConfiguration;
@@ -30,23 +27,15 @@ public class KiteConnectServiceImp implements KiteConnectService{
         return kiteConnectConfiguration.createKiteConnectSession(requestToken);
     }
 
-    @Override
-    public KiteConnect getKiteConnectInstance(String accessToken) {
-        return kiteConnectConfiguration.getKiteConnectInstance(accessToken);
+    private String getToken(String authHeader){
+        return authHeader.substring(7);
     }
 
     @Override
-    public void setToken(String authHeader){
-        if (authHeader == null || !authHeader.startsWith("Bearer")) {
-            return;
-        }
-        this.accessToken = authHeader.substring(7);
-    }
-
-    @Override
-    public void brokerLogout(){
+    public void brokerLogout(String authHeader){
         try {
-            KiteConnect kiteConnect = kiteConnectConfiguration.getKiteConnectInstance(accessToken);
+            String token = getToken(authHeader);
+            KiteConnect kiteConnect = kiteConnectConfiguration.getKiteConnectInstance(token);
             kiteConnect.logout();
         }catch (IOException | KiteException e){
             throw new RuntimeException(e);
@@ -54,9 +43,10 @@ public class KiteConnectServiceImp implements KiteConnectService{
     }
 
     @Override
-    public List<Position> getPositions() {
+    public List<Position> getPositions(String authHeader) {
         try {
-            KiteConnect kiteConnect = kiteConnectConfiguration.getKiteConnectInstance(accessToken);
+            String token = getToken(authHeader);
+            KiteConnect kiteConnect = kiteConnectConfiguration.getKiteConnectInstance(token);
             Map<String, List<com. zerodhatech. models.Position>> positions = kiteConnect.getPositions();
             List<com. zerodhatech. models.Position> kitePositions =  positions.get("net");
 

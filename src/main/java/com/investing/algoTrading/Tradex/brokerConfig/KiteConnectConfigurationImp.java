@@ -20,12 +20,6 @@ public class KiteConnectConfigurationImp implements KiteConnectConfiguration {
     @Value("${kite.apiSecret}")
     private String apiSecret;
 
-    private final KiteSessionManager kiteSessionManager;
-
-    public KiteConnectConfigurationImp(KiteSessionManager kiteSessionManager){
-        this.kiteSessionManager = kiteSessionManager;
-    }
-
     @Override
     public KiteSession createKiteConnectSession(String requestToken) {
 
@@ -48,7 +42,9 @@ public class KiteConnectConfigurationImp implements KiteConnectConfiguration {
 
     @Override
     public KiteConnect getKiteConnectInstance(String accessToken){
-        return kiteSessionManager.getOrCreateSession(accessToken, apiKey);
+        KiteConnect kiteConnect = new KiteConnect(apiKey);
+        kiteConnect.setAccessToken(accessToken);
+        return kiteConnect;
     }
 
 }

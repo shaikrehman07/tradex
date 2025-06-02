@@ -10,9 +10,8 @@ import java.util.List;
 public interface BrokerService {
 
     KiteSession createKiteConnectSession(String requestToken);
-    void setToken(String authHeader);
-    void brokerLogout();
-    List<Position> getPositions();
+    void brokerLogout(String accessToken);
+    List<Position> getPositions(String accessToken);
     void placeOrder();
     void modifyOrder();
     void cancelOrder();
