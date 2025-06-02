@@ -1,8 +1,10 @@
 package com.investing.algoTrading.Tradex.controller;
 
+import com.investing.algoTrading.Tradex.model.KiteSession;
 import com.investing.algoTrading.Tradex.model.Position;
 import com.investing.algoTrading.Tradex.service.KiteConnectService;
 
+import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,37 +22,33 @@ public class TradexController {
     }
 
 
-    @GetMapping("/login-url")
-    public ResponseEntity<String> getLoginUrl() {
-        String loginURL = kiteConnectService.getLoginURL();
-        return ResponseEntity.ok(loginURL);
-    }
-
     @PostMapping("/session")
-    public ResponseEntity<String> createSession(@RequestBody Map<String, String> body) {
-        String requestToken = body.get("requestToken");
+    public ResponseEntity<KiteSession> createSession(@RequestHeader("Authorization") String requestToken) {
 
         if (requestToken == null || requestToken.isEmpty()) {
-            return ResponseEntity.badRequest().body("Missing request token");
+            throw new RuntimeException("Request token not present.");
         }
 
-        boolean isSessionCreated = kiteConnectService.createKiteConnectSession(requestToken);
-        if(isSessionCreated) {
-            return ResponseEntity.ok("Session created successfully");
+        KiteSession session = kiteConnectService.createKiteConnectSession(requestToken);
+
+        if(session.getLoginStatus()){
+            return ResponseEntity.ok(session);
         }
 
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Session creation failure");
+        return ResponseEntity.ok(new KiteSession());
+
     }
 
     @GetMapping("/logout")
-    public ResponseEntity<Void> brokerLogout(){
+    public ResponseEntity<Void> brokerLogout(@RequestHeader("Authorization") String authHeader){
+        kiteConnectService.setToken(authHeader);
         kiteConnectService.brokerLogout();
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/positions")
-    public ResponseEntity<List<Position>> getPositions(){
+    public ResponseEntity<List<Position>> getPositions(@RequestHeader("Authorization") String authHeader){
+        kiteConnectService.setToken(authHeader);
         List<Position> positions = kiteConnectService.getPositions();
         return ResponseEntity.ok(positions);
     }

@@ -1,14 +1,16 @@
 package com.investing.algoTrading.Tradex.service;
 
 
+import com.investing.algoTrading.Tradex.model.KiteSession;
 import com.investing.algoTrading.Tradex.model.Position;
+import org.json.JSONObject;
 
 import java.util.List;
 
 public interface BrokerService {
 
-    String getLoginURL();
-    boolean createKiteConnectSession(String requestToken);
+    KiteSession createKiteConnectSession(String requestToken);
+    void setToken(String authHeader);
     void brokerLogout();
     List<Position> getPositions();
     void placeOrder();
